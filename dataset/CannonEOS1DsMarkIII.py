@@ -35,9 +35,10 @@ def download(root, url):
         os.makedirs(fname)
 
 if __name__ == "__main__":
-    import inspect, os
-    fname = inspect.getfile(inspect.currentframe()) ).strip().split(".")[0]
-
-
-
-    for key, value in data.items():
+    pass
+    # import inspect, os
+    # fname = inspect.getfile(inspect.currentframe()) ).strip().split(".")[0]
+    #
+    #
+    #
+    # for key, value in data.items():

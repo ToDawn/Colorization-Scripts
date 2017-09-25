@@ -1,3 +1,4 @@
+import os, os.path as osp
 
 import numpy as np
 from PIL import Image
@@ -26,23 +27,36 @@ def find_test_images(path1, path2, extension=IMG_EXTENSION):
     return list(s1 & s2)
 
 
-def test_single_image(path1, path2):
-    img1 = np.array(Image.open(path1))
-    img2 = np.array(Image.open(path2))
+def test_single_image(img_path1, img_path2):
+    img1 = np.array(Image.open(img_path1))
+    img2 = np.array(Image.open(img_path2))
 
     # gamma?
 
     img1 = img1.reshape(-1, 3)
     img2 = img2.reshape(-1, 3)
 
-    all_result = []
+    result = []
 
     for row in range(img1.shape[0]):
         res = img1[row] * img2[row].T
-        all_result.append(res)
+        result.append(res)
 
-    return all_result
+    return result
 
+
+def test_all_images(path1, path2):
+    files = find_test_images(path1, path2)
+
+    result = []
+
+    for f in files:
+        ipath1 = osp.join(path1, f)
+        ipath2 = osp.join(path2, f)
+
+        result.append(test_single_image(ipath1, ipath2))
+
+    return result
 
 
 if __name__ == "__main__":

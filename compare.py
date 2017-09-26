@@ -6,7 +6,7 @@ from PIL import Image
 from common import walk_directory
 
 IMG_EXTENSION = ["jpg"]
-
+eps = 1e-8
 
 def normalize(img):
     """
@@ -28,8 +28,16 @@ def find_test_images(path1, path2, extension=IMG_EXTENSION):
 
 
 def test_single_image(img_path1, img_path2):
-    img1 = np.array(Image.open(img_path1))
-    img2 = np.array(Image.open(img_path2))
+    img1 = Image.open(img_path1)
+    img2 = Image.open(img_path2)
+
+    # resize to keep same
+    w, h = img1.size
+    img2 = img2.resize((w, h), Image.ANTIALIAS)
+
+    # to numpy
+    img1 = np.array(img1, dtype=np.float)
+    img2 = np.array(img2, dtype=np.float)
 
     # gamma?
 
@@ -39,8 +47,9 @@ def test_single_image(img_path1, img_path2):
     result = []
 
     for row in range(img1.shape[0]):
-        res = img1[row] * img2[row].T
-        result.append(res)
+        res = np.dot(img1[row], img2[row].T) / (np.linalg.norm(img1[row]) * np.linalg.norm(img2[row]) + eps)
+        angle = np.arccos(res)
+        result.append(angle)
 
     return result
 
@@ -54,7 +63,10 @@ def test_all_images(path1, path2):
         ipath1 = osp.join(path1, f)
         ipath2 = osp.join(path2, f)
 
-        result.append(test_single_image(ipath1, ipath2))
+        temp_res = test_single_image(ipath1, ipath2)
+        result.append(temp_res)
+
+        print(f, np.mean(temp_res))
 
     return result
 
